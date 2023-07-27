@@ -64,4 +64,12 @@ public class PersonController : ControllerBase
             ? this.NotFound()
             : this.Ok(updated);
     }
+
+    [HttpPost]
+    [Route("reset")]
+    public IActionResult Reset()
+    {
+        this.Service.Reset();
+        return this.NoContent();
+    }
 }

@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.IO;
 using System;
+using CsvHelper.Configuration;
+using CsvHelper;
 
 namespace Stereograph.TechnicalTest.Api.Services;
 
@@ -62,5 +66,34 @@ public class PersonService
         toUpdate.City = newVersion.City;
         this.SaveChanges();
         return toUpdate;
+    }
+
+    public void Reset()
+    {
+        this.Persons.RemoveRange(this.Persons);
+
+        Dictionary<string, string> propertiesMapper = new()
+        {
+            ["FirstName"] = "first_name",
+            ["LastName"] = "last_name",
+            ["Email"] = "email",
+            ["Address"] = "address",
+            ["City"] = "city"
+        };
+        CsvConfiguration config = new(CultureInfo.InvariantCulture)
+        {
+            NewLine = Environment.NewLine,
+            HeaderValidated = null,
+            MissingFieldFound = null,
+            PrepareHeaderForMatch = args => propertiesMapper.GetValueOrDefault(args.Header) ?? args.Header
+        };
+
+        string personsCsvPath = Path.Combine("Ressources", "Persons.csv");
+        using (StreamReader reader = new(personsCsvPath))
+        using (CsvReader csv = new(reader, config))
+        {
+            this.Persons.AddRange(csv.GetRecords<Person>());
+        }
+        this.SaveChanges();
     }
 }
