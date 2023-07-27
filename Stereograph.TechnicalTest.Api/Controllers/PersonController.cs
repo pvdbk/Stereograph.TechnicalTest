@@ -54,6 +54,11 @@ public class PersonController : ControllerBase
     [Route("")]
     public IActionResult Update([FromBody] Person newVersion)
     {
+        if (newVersion.Id is null)
+        {
+            return this.BadRequest();
+        }
+
         Person updated = this.Service.Update(newVersion);
         return updated is null
             ? this.NotFound()

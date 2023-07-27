@@ -20,7 +20,9 @@ public class PersonService
 
     public IEnumerable<Person> GetAll() => this.Persons;
 
-    public Person GetById(int id) => this.Persons.FirstOrDefault(person => person.Id == id);
+    public Person GetById(int? id) => id is null
+        ? null
+        : this.Persons.FirstOrDefault(person => person.Id == id);
 
     public Person Add(Person toAdd)
     {
@@ -52,6 +54,7 @@ public class PersonService
         {
             return null;
         }
+
         toUpdate.FirstName = newVersion.FirstName;
         toUpdate.LastName = newVersion.LastName;
         toUpdate.Email = newVersion.Email;
