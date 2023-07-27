@@ -11,6 +11,8 @@ using System;
 
 namespace Stereograph.TechnicalTest.Api;
 
+using Services;
+
 public class Startup
 {
     public Startup(IConfiguration configuration)
@@ -38,6 +40,7 @@ public class Startup
         });
 
         services
+            .AddScoped<PersonService>()
             .AddControllers();
     }
 
