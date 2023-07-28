@@ -17,6 +17,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Moq" Version="4.18.4" />
+    <ProjectReference Include="..\Stereograph.TechnicalTest.Api\Stereograph.TechnicalTest.Api.csproj" />
   </ItemGroup>
 
 </Project>
