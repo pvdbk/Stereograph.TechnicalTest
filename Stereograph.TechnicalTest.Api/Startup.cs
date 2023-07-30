@@ -41,6 +41,7 @@ public class Startup
 
         services
             .AddScoped<PersonService>()
+            .AddScoped<FollowingService>()
             .AddControllers();
     }
 
