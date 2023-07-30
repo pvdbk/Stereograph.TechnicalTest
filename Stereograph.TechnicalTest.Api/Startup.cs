@@ -46,6 +46,9 @@ public class Startup
 
     public void Configure(IApplicationBuilder application, IWebHostEnvironment environment)
     {
+        application
+            .UseHttpsRedirection();
+
         if (environment.IsDevelopment())
         {
             application
@@ -55,7 +58,6 @@ public class Startup
         }
 
         application
-            .UseHttpsRedirection()
             .UseRouting()
             .UseCors()
             .UseEndpoints(endpoints => endpoints.MapControllers());
