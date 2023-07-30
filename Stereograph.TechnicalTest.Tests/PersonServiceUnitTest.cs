@@ -1,6 +1,7 @@
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Linq;
 using Xunit;
 using Moq;
@@ -111,15 +112,16 @@ public class PersonServiceUnitTest
         PersonService service = new(mockContext.Object);
 
         Person updated = service.Update(newVersion);
-        void AssertSimilar(Person expected, Person actual) => Assert.Equal(
-            JsonSerializer.Serialize(expected),
-            JsonSerializer.Serialize(actual)
-        );
-
-        AssertSimilar(newVersion, updated);
-        AssertSimilar(newVersion, service.GetById(id));
+        Assert.Equal(updated.FirstName, "FirstName x");
+        AssertSimilarPersons(newVersion, updated);
+        AssertSimilarPersons(newVersion, service.GetById(id));
         mockContext.Verify(m => m.SaveChanges(), Times.Once);
     }
+
+    private void AssertSimilarPersons(Person expected, Person actual) => Assert.Equal(
+        JsonSerializer.Serialize(expected),
+        JsonSerializer.Serialize(actual)
+    );
 
     private List<Person> GetNewPersons() => new()
     {
@@ -168,8 +170,9 @@ public class PersonServiceUnitTest
     private Mock<ApplicationDbContext> GetMockContext(Mock<DbSet<Person>> mockSet = null)
     {
         mockSet ??= this.GetMockSet();
-        var mockContext = new Mock<ApplicationDbContext>();
+        Mock<ApplicationDbContext> mockContext = new();
         mockContext.Setup(c => c.Persons).Returns(mockSet.Object);
+        mockContext.Setup(c => c.Entry(It.IsAny<Person>())).Returns((EntityEntry<Person>)null);
         return mockContext;
     }
 }

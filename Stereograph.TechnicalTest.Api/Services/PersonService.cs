@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,18 +16,36 @@ public class PersonService
 {
     private DbSet<Person> Persons { get; init; }
     private Func<int> SaveChanges { get; init; }
+    private Func<Person, EntityEntry<Person>> Entry { get; init; }
 
     public PersonService(ApplicationDbContext dbContext)
     {
         this.Persons = dbContext.Persons;
         this.SaveChanges = dbContext.SaveChanges;
+        this.Entry = dbContext.Entry<Person>;
     }
 
     public IEnumerable<Person> GetAll() => this.Persons;
 
-    public Person GetById(int? id) => id is null
+    private Person GetByIdWithoutLoading(int? id) => id is null
         ? null
-        : this.Persons.FirstOrDefault(person => person.Id == id);
+        : this
+            .Persons
+            .FirstOrDefault(person => person.Id == id);
+
+    public Person GetById(int? id)
+    {
+        Person person = this.GetByIdWithoutLoading(id);
+        if (person is null)
+        {
+            return null;
+        }
+
+        EntityEntry entry = this.Entry(person);
+        entry?.Collection("Followers").Load();
+        entry?.Collection("FollowedPersons").Load();
+        return person;
+    }
 
     public Person Add(Person toAdd)
     {
@@ -37,7 +56,7 @@ public class PersonService
 
     public bool Remove(int id)
     {
-        Person toRemove = this.GetById(id);
+        Person toRemove = this.GetByIdWithoutLoading(id);
         if (toRemove is null)
         {
             return false;

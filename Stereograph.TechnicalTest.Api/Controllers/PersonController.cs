@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Stereograph.TechnicalTest.Api.Controllers;
 
@@ -19,7 +20,11 @@ public class PersonController : ControllerBase
 
     [HttpGet]
     [Route("")]
-    public IActionResult GetAll() => this.Ok(this.Service.GetAll());
+    public IActionResult GetAll() => this.Ok(this
+        .Service
+        .GetAll()
+        .Select(person => new PersonDTO(person))
+    );
 
     [HttpGet]
     [Route("{id}")]
@@ -28,14 +33,14 @@ public class PersonController : ControllerBase
         Person person = this.Service.GetById(id);
         return person is null
             ? this.NotFound()
-            : this.Ok(person);
+            : this.Ok(new PersonExtendedDTO(person));
     }
 
     [HttpPost]
     [Route("")]
-    public IActionResult Add([FromBody] Person toAdd)
+    public IActionResult Add([FromBody] PersonDTO toAdd)
     {
-        Person added = this.Service.Add(toAdd);
+        PersonDTO added = new(this.Service.Add(new(toAdd)));
         HttpRequest request = this.HttpContext.Request;
         return this.Created($"{request.Scheme}://{request.Host}{request.Path}/{added.Id}", added);
     }
@@ -52,17 +57,17 @@ public class PersonController : ControllerBase
 
     [HttpPut]
     [Route("")]
-    public IActionResult Update([FromBody] Person newVersion)
+    public IActionResult Update([FromBody] PersonDTO newVersion)
     {
         if (newVersion.Id is null)
         {
             return this.BadRequest();
         }
 
-        Person updated = this.Service.Update(newVersion);
+        Person updated = this.Service.Update(new(newVersion));
         return updated is null
             ? this.NotFound()
-            : this.Ok(updated);
+            : this.Ok(new PersonExtendedDTO(updated));
     }
 
     [HttpPost]

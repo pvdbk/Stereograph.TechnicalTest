@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
 namespace Stereograph.TechnicalTest.Api.Models;
 
-public class Person
+public class PersonDTO
 {
     public int? Id { get; set; }
     public string FirstName { get; set; }
@@ -11,14 +9,9 @@ public class Person
     public string Address { get; set; }
     public string City { get; set; }
 
-    public List<Person> Followers { get; set; }
-    public List<Person> FollowedPersons { get; set; }
-    public List<Following> Followings { get; set; }
-    public List<Following> FollowingsBy { get; set; }
+    public PersonDTO() { }
 
-    public Person() { }
-
-    public Person(PersonDTO person)
+    public PersonDTO(Person person)
     {
         this.Id = person.Id;
         this.FirstName = person.FirstName;
