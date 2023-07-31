@@ -70,11 +70,19 @@ public class PersonController : ControllerBase
             : this.Ok(new PersonExtendedDTO(updated));
     }
 
-    [HttpPost]
+    [HttpPut]
     [Route("reset")]
-    public IActionResult Reset()
+    public IActionResult Clear()
     {
-        this.Service.Reset();
+        this.Service.Clear();
+        return this.NoContent();
+    }
+
+    [HttpPost]
+    [Route("fill")]
+    public IActionResult Fill()
+    {
+        this.Service.Fill();
         return this.NoContent();
     }
 }

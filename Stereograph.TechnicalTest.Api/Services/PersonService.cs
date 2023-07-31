@@ -87,10 +87,14 @@ public class PersonService
         return toUpdate;
     }
 
-    public void Reset()
+    public void Clear()
     {
         this.Persons.RemoveRange(this.Persons);
+        this.SaveChanges();
+    }
 
+    public void Fill()
+    {
         Dictionary<string, string> propertiesMapper = new()
         {
             ["FirstName"] = "first_name",
